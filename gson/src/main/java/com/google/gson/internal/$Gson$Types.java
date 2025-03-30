@@ -511,6 +511,9 @@ public final class $Gson$Types {
   // our way to ensure that the Type in question is either Class (which is serializable) or one of
   // the nested Type implementations here (which are also serializable).
   private static final class ParameterizedTypeImpl implements ParameterizedType, Serializable {
+    //varible représentant la taille maximal d'un argument
+    private static final int MAX_SIZE_LENGTH = 30;
+
     @SuppressWarnings("serial")
     private final Type ownerType;
 
@@ -574,7 +577,7 @@ public final class $Gson$Types {
         return typeToString(rawType);
       }
 
-      StringBuilder stringBuilder = new StringBuilder(30 * (length + 1));
+      StringBuilder stringBuilder = new StringBuilder(MAX_SIZE_LENGTH * (length + 1));
       stringBuilder
           .append(typeToString(rawType))
           .append("<")
