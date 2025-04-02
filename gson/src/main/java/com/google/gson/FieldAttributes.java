@@ -141,9 +141,4 @@ public final class FieldAttributes {
   public boolean hasModifier(int modifier) {
     return (field.getModifiers() & modifier) != 0;
   }
-
-  @Override
-  public String toString() {
-    return field.toString();
-  }
 }
