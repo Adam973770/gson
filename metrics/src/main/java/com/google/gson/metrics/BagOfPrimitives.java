@@ -40,10 +40,6 @@ public class BagOfPrimitives {
     this.stringValue = stringValue;
   }
 
-  public int getIntValue() {
-    return intValue;
-  }
-
   public String getExpectedJson() {
     return "{"
         + "\"longValue\":"
