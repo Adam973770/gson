@@ -125,4 +125,18 @@ public class TypeAdapterTest {
   public void testFromJson_String_TrailingData() throws IOException {
     assertThat(adapter.fromJson("\"a\"1")).isEqualTo("a");
   }
+
+  @Test
+  public void testFromJson_InvalidJson() throws IOException {
+    // Je ne met pas de valeur a l'attribut "age" pour que JSON soit mal formé
+    String invalidJson = "{ 'name': 'Adam', 'age': }";
+    IllegalStateException exception =
+        assertThrows(
+            IllegalStateException.class,
+            () -> {
+              adapter.fromJson(invalidJson);
+            });
+    // Je verifie si l'exeption IllegalStateException est lancé
+    assertThat(exception).isInstanceOf(IllegalStateException.class);
+  }
 }
