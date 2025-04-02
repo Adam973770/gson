@@ -195,4 +195,18 @@ public class JsonParserTest {
     // Original strictness was kept
     assertThat(reader.getStrictness()).isEqualTo(strictness);
   }
+
+  @Test
+  public void testParseEscapedCharacters() {
+    String json =
+        "{\"escapedQuote\":\"\\\"quoted text\\\"\", \"escapedBackslash\":\"\\\\backslash\"}";
+    JsonElement e = JsonParser.parseString(json);
+    JsonObject jsonObject = e.getAsJsonObject();
+    // ici je test la chaîne avec le guillemet échappé
+    String escapedQuote = jsonObject.get("escapedQuote").getAsString();
+    assertThat(escapedQuote).isEqualTo("\"quoted text\"");
+    // cici je test la chaîne avec la barre oblique inversée échappée
+    String escapedBackslash = jsonObject.get("escapedBackslash").getAsString();
+    assertThat(escapedBackslash).isEqualTo("\\backslash");
+  }
 }
