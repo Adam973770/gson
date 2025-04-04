@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
  * annotation is useful to manage versioning of your JSON classes for a web-service.
  *
  * <p>This annotation has no effect unless you build {@link com.google.gson.Gson} with a {@code
- * GsonBuilder} and invoke the {@link GsonBuilder#setVersion(double)} method.
+ * GsonBuilder} and invoke the {@link GsonBuilder#setVersionGsonBuilder(double)} method.
  *
  * <p>Here is an example of how this annotation is meant to be used:
  *
@@ -45,15 +45,15 @@ import java.lang.annotation.Target;
  *
  * <p>If you created Gson with {@code new Gson()}, the {@code toJson()} and {@code fromJson()}
  * methods will use all the fields for serialization and deserialization. However, if you created
- * Gson with {@code Gson gson = new GsonBuilder().setVersion(1.2).create()} then the {@code
- * toJson()} and {@code fromJson()} methods of Gson will exclude the {@code emailAddress} and {@code
- * password} fields from the example above, because the version number passed to the GsonBuilder,
- * {@code 1.2}, exceeds the version number set on the {@code Until} annotation, {@code 1.1}, for
- * those fields.
+ * Gson with {@code Gson gson = new GsonBuilder().setVersionGsonBuilder(1.2).create()} then the
+ * {@code toJson()} and {@code fromJson()} methods of Gson will exclude the {@code emailAddress} and
+ * {@code password} fields from the example above, because the version number passed to the
+ * GsonBuilder, {@code 1.2}, exceeds the version number set on the {@code Until} annotation, {@code
+ * 1.1}, for those fields.
  *
  * @author Inderjeet Singh
  * @author Joel Leitch
- * @see GsonBuilder#setVersion(double)
+ * @see GsonBuilder#setVersionGsonBuilder(double)
  * @see Since
  * @since 1.3
  */

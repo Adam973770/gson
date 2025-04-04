@@ -238,7 +238,8 @@ public final class Gson {
    *       can enable Gson to serialize/deserialize only those fields marked with this annotation
    *       through {@link GsonBuilder#excludeFieldsWithoutExposeAnnotation()}.
    *   <li>By default, Gson ignores the {@link com.google.gson.annotations.Since} annotation. You
-   *       can enable Gson to use this annotation through {@link GsonBuilder#setVersion(double)}.
+   *       can enable Gson to use this annotation through {@link
+   *       GsonBuilder#setVersionGsonBuilder(double)}.
    *   <li>The default field naming policy for the output JSON is same as in Java. So, a Java class
    *       field {@code versionNumber} will be output as {@code "versionNumber"} in JSON. The same
    *       rules are applied for mapping incoming JSON to the Java classes. You can change this
