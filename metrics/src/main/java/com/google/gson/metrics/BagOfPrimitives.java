@@ -25,7 +25,7 @@ import com.google.common.base.Objects;
 public class BagOfPrimitives {
   public static final long DEFAULT_VALUE = 0;
   public long longValue;
-  public int intValue;
+  public float floatValue;
   public boolean booleanValue;
   public String stringValue;
 
@@ -33,9 +33,10 @@ public class BagOfPrimitives {
     this(DEFAULT_VALUE, 0, false, "");
   }
 
-  public BagOfPrimitives(long longValue, int intValue, boolean booleanValue, String stringValue) {
+  public BagOfPrimitives(
+      long longValue, float floatValue, boolean booleanValue, String stringValue) {
     this.longValue = longValue;
-    this.intValue = intValue;
+    this.floatValue = floatValue;
     this.booleanValue = booleanValue;
     this.stringValue = stringValue;
   }
@@ -45,8 +46,8 @@ public class BagOfPrimitives {
         + "\"longValue\":"
         + longValue
         + ","
-        + "\"intValue\":"
-        + intValue
+        + "\"floatValue\":"
+        + floatValue
         + ","
         + "\"booleanValue\":"
         + booleanValue
@@ -62,7 +63,7 @@ public class BagOfPrimitives {
     int prime = 31;
     int result = 1;
     result = prime * result + (booleanValue ? 1231 : 1237);
-    result = prime * result + intValue;
+    result = prime * result + Float.floatToIntBits(floatValue);
     result = prime * result + (int) (longValue ^ (longValue >>> 32));
     result = prime * result + ((stringValue == null) ? 0 : stringValue.hashCode());
     return result;
@@ -78,7 +79,7 @@ public class BagOfPrimitives {
     }
     BagOfPrimitives that = (BagOfPrimitives) o;
     return longValue == that.longValue
-        && intValue == that.intValue
+        && Float.compare(floatValue, that.floatValue) == 0
         && booleanValue == that.booleanValue
         && Objects.equal(stringValue, that.stringValue);
   }
@@ -86,7 +87,7 @@ public class BagOfPrimitives {
   @Override
   public String toString() {
     return String.format(
-        "(longValue=%d,intValue=%d,booleanValue=%b,stringValue=%s)",
-        longValue, intValue, booleanValue, stringValue);
+        "(longValue=%d,floatValue=%f,booleanValue=%b,stringValue=%s)",
+        longValue, floatValue, booleanValue, stringValue);
   }
 }
