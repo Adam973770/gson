@@ -22,7 +22,7 @@ package com.google.gson.examples.android.model;
  */
 public class LineItem {
   private final String name;
-  private final int quantity;
+  private final float quantity;
   private final long priceInMicros;
   private final String currencyCode;
 
