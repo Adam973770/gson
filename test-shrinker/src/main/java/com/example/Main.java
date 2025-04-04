@@ -251,7 +251,7 @@ public class Main {
   }
 
   private static void testVersionAnnotations(BiConsumer<String, String> outputConsumer) {
-    Gson gson = new GsonBuilder().setVersion(1).create();
+    Gson gson = new GsonBuilder().setVersionGsonBuilder(1).create();
     TestExecutor.run(
         outputConsumer,
         "Write: Version annotations",

@@ -591,7 +591,7 @@ public class VersionedClass {
 }
 
 VersionedClass versionedObject = new VersionedClass();
-Gson gson = new GsonBuilder().setVersion(1.0).create();
+Gson gson = new GsonBuilder().setVersionGsonBuilder(1.0).create();
 String jsonOutput = gson.toJson(versionedObject);
 System.out.println(jsonOutput);
 System.out.println();

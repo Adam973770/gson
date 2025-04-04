@@ -8,10 +8,10 @@ public class ClassWithVersionAnnotations {
   @Since(1)
   int i1;
 
-  @Until(1) // will be ignored with GsonBuilder.setVersion(1)
+  @Until(1) // will be ignored with GsonBuilder.setVersionGsonBuilder(1)
   int i2;
 
-  @Since(2) // will be ignored with GsonBuilder.setVersion(1)
+  @Since(2) // will be ignored with GsonBuilder.setVersionGsonBuilder(1)
   int i3;
 
   @Until(2)

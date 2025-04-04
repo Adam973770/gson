@@ -207,12 +207,14 @@ public class GsonBuilderTest {
   }
 
   @Test
-  public void testSetVersionInvalid() {
+  public void testsetVersionGsonBuilderInvalid() {
     GsonBuilder builder = new GsonBuilder();
-    var e = assertThrows(IllegalArgumentException.class, () -> builder.setVersion(Double.NaN));
+    var e =
+        assertThrows(
+            IllegalArgumentException.class, () -> builder.setVersionGsonBuilder(Double.NaN));
     assertThat(e).hasMessageThat().isEqualTo("Invalid version: NaN");
 
-    e = assertThrows(IllegalArgumentException.class, () -> builder.setVersion(-0.1));
+    e = assertThrows(IllegalArgumentException.class, () -> builder.setVersionGsonBuilder(-0.1));
     assertThat(e).hasMessageThat().isEqualTo("Invalid version: -0.1");
   }
 
