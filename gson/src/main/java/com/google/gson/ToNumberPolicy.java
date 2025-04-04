@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.google.gson;
 
 import com.google.gson.internal.LazilyParsedNumber;
@@ -32,11 +31,6 @@ import java.math.BigDecimal;
  * @since 2.8.9
  */
 public enum ToNumberPolicy implements ToNumberStrategy {
-
-  /**
-   * Using this policy will ensure that numbers will be read as {@link Double} values. This is the
-   * default strategy used during deserialization of numbers as {@link Object}.
-   */
   DOUBLE {
     @Override
     public Double readNumber(JsonReader in) throws IOException {
@@ -66,7 +60,7 @@ public enum ToNumberPolicy implements ToNumberStrategy {
    */
   LONG_OR_DOUBLE {
     @Override
-    public Number readNumber(JsonReader in) throws IOException, JsonParseException {
+    public Number readNumber(JsonReader in) throws IOException {
       String value = in.nextString();
       if (value.indexOf('.') >= 0) {
         return parseAsDouble(value, in);
