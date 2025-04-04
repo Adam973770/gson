@@ -69,7 +69,7 @@ import java.util.Objects;
  *     .setDateFormat(DateFormat.LONG, DateFormat.LONG)
  *     .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
  *     .setPrettyPrinting()
- *     .setVersion(1.0)
+ *     .setVersionGsonBuilder(1.0)
  *     .create();
  * </pre>
  *
@@ -167,7 +167,7 @@ public final class GsonBuilder {
    * @see Until
    */
   @CanIgnoreReturnValue
-  public GsonBuilder setVersion(double version) {
+  public GsonBuilder setVersionGsonBuilder(double version) {
     if (Double.isNaN(version) || version < 0.0) {
       throw new IllegalArgumentException("Invalid version: " + version);
     }
