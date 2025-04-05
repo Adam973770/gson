@@ -186,7 +186,23 @@ public final class TypeAdapters {
       new TypeAdapter<Number>() {
         @Override
         public Number read(JsonReader in) throws IOException {
-          return readIntegerWithinBounds(in, Byte.MIN_VALUE, 255, "byte", value -> (byte) value);
+          if (in.peek() == JsonToken.NULL) {
+            in.nextNull();
+            return null;
+          }
+
+          int intValue;
+          try {
+            intValue = in.nextInt();
+          } catch (NumberFormatException e) {
+            throw new JsonSyntaxException(e);
+          }
+          // Allow up to 255 to support unsigned values
+          if (intValue > 255 || intValue < Byte.MIN_VALUE) {
+            throw new JsonSyntaxException(
+                "Lossy conversion from " + intValue + " to byte; at path " + in.getPreviousPath());
+          }
+          return (byte) intValue;
         }
 
         @Override
@@ -205,8 +221,23 @@ public final class TypeAdapters {
       new TypeAdapter<Number>() {
         @Override
         public Number read(JsonReader in) throws IOException {
-          return readIntegerWithinBounds(
-              in, Short.MIN_VALUE, 65535, "short", value -> (short) value);
+          if (in.peek() == JsonToken.NULL) {
+            in.nextNull();
+            return null;
+          }
+
+          int intValue;
+          try {
+            intValue = in.nextInt();
+          } catch (NumberFormatException e) {
+            throw new JsonSyntaxException(e);
+          }
+          // Allow up to 65535 to support unsigned values
+          if (intValue > 65535 || intValue < Short.MIN_VALUE) {
+            throw new JsonSyntaxException(
+                "Lossy conversion from " + intValue + " to short; at path " + in.getPreviousPath());
+          }
+          return (short) intValue;
         }
 
         @Override
@@ -901,39 +932,5 @@ public final class TypeAdapters {
         return "Factory[typeHierarchy=" + clazz.getName() + ",adapter=" + typeAdapter + "]";
       }
     };
-  }
-
-  /** code ajouté pour éviter les duplications (lignes 187-198 et lignes 222-233) */
-  private static Number readIntegerWithinBounds(
-      JsonReader in,
-      int minValue,
-      int maxValue,
-      String typeName,
-      java.util.function.IntFunction<Number> converter)
-      throws IOException {
-
-    if (in.peek() == JsonToken.NULL) {
-      in.nextNull();
-      return null;
-    }
-
-    int intValue;
-    try {
-      intValue = in.nextInt();
-    } catch (NumberFormatException e) {
-      throw new JsonSyntaxException(e);
-    }
-
-    if (intValue > maxValue || intValue < minValue) {
-      throw new JsonSyntaxException(
-          "Lossy conversion from "
-              + intValue
-              + " to "
-              + typeName
-              + "; at path "
-              + in.getPreviousPath());
-    }
-
-    return converter.apply(intValue);
   }
 }
