@@ -23,12 +23,17 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.ParameterizedTypeFixtures;
+import com.google.gson.ParameterizedTypeFixtures.MyParameterizedType;
+import com.google.gson.ParameterizedTypeFixtures.MyParameterizedTypeAdapter;
+import com.google.gson.ParameterizedTypeFixtures.MyParameterizedTypeInstanceCreator;
 import com.google.gson.common.TestTypes.BagOfPrimitives;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
+import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,28 +57,26 @@ public class ParameterizedTypesTest {
 
   @Test
   public void testParameterizedTypesSerialization() {
-    Integer value = 10;
-    Type typeOfSrc = new TypeToken<Integer>() {}.getType();
-    Gson gson =
-        new GsonBuilder()
-            .registerTypeAdapter(
-                typeOfSrc, new ParameterizedTypeFixtures.MyParameterizedTypeAdapter<>())
-            .create();
-    String json = gson.toJson(value, typeOfSrc);
-    assertThat(json).isEqualTo("{\"Integer\":10}");
+    MyParameterizedType<Integer> src = new MyParameterizedType<>(10);
+    Type typeOfSrc = new TypeToken<MyParameterizedType<Integer>>() {}.getType();
+    String json = gson.toJson(src, typeOfSrc);
+    assertThat(json).isEqualTo(src.getExpectedJson());
   }
 
   @Test
   public void testParameterizedTypeDeserialization() {
-    BagOfPrimitives expected = new BagOfPrimitives();
-    Type type = new TypeToken<BagOfPrimitives>() {}.getType();
+    BagOfPrimitives bag = new BagOfPrimitives();
+    MyParameterizedType<BagOfPrimitives> expected = new MyParameterizedType<>(bag);
+    Type expectedType = new TypeToken<MyParameterizedType<BagOfPrimitives>>() {}.getType();
+    BagOfPrimitives bagDefaultInstance = new BagOfPrimitives();
     Gson gson =
         new GsonBuilder()
             .registerTypeAdapter(
-                type, new ParameterizedTypeFixtures.MyParameterizedTypeAdapter<BagOfPrimitives>())
+                expectedType, new MyParameterizedTypeInstanceCreator<>(bagDefaultInstance))
             .create();
-    String json = gson.toJson(expected, type);
-    BagOfPrimitives actual = gson.fromJson(json, type);
+
+    String json = expected.getExpectedJson();
+    MyParameterizedType<BagOfPrimitives> actual = gson.fromJson(json, expectedType);
     assertThat(actual).isEqualTo(expected);
   }
 
@@ -104,6 +107,73 @@ public class ParameterizedTypesTest {
     MultiParameters<Integer, Float, Double, String, BagOfPrimitives> expected =
         new MultiParameters<>(10, 1.0F, 2.1D, "abc", new BagOfPrimitives());
     assertThat(target).isEqualTo(expected);
+  }
+
+  @Test
+  public void testParameterizedTypeWithCustomSerializer() {
+    Type ptIntegerType = new TypeToken<MyParameterizedType<Integer>>() {}.getType();
+    Type ptStringType = new TypeToken<MyParameterizedType<String>>() {}.getType();
+    Gson gson =
+        new GsonBuilder()
+            .registerTypeAdapter(ptIntegerType, new MyParameterizedTypeAdapter<Integer>())
+            .registerTypeAdapter(ptStringType, new MyParameterizedTypeAdapter<String>())
+            .create();
+    MyParameterizedType<Integer> intTarget = new MyParameterizedType<>(10);
+    String json = gson.toJson(intTarget, ptIntegerType);
+    assertThat(json).isEqualTo(MyParameterizedTypeAdapter.getExpectedJson(intTarget));
+
+    MyParameterizedType<String> stringTarget = new MyParameterizedType<>("abc");
+    json = gson.toJson(stringTarget, ptStringType);
+    assertThat(json).isEqualTo(MyParameterizedTypeAdapter.getExpectedJson(stringTarget));
+  }
+
+  @Test
+  public void testParameterizedTypesWithCustomDeserializer() {
+    Type ptIntegerType = new TypeToken<MyParameterizedType<Integer>>() {}.getType();
+    Type ptStringType = new TypeToken<MyParameterizedType<String>>() {}.getType();
+    Gson gson =
+        new GsonBuilder()
+            .registerTypeAdapter(ptIntegerType, new MyParameterizedTypeAdapter<Integer>())
+            .registerTypeAdapter(ptStringType, new MyParameterizedTypeAdapter<String>())
+            .registerTypeAdapter(ptStringType, new MyParameterizedTypeInstanceCreator<>(""))
+            .registerTypeAdapter(ptIntegerType, new MyParameterizedTypeInstanceCreator<>(0))
+            .create();
+
+    MyParameterizedType<Integer> src = new MyParameterizedType<>(10);
+    String json = MyParameterizedTypeAdapter.getExpectedJson(src);
+    MyParameterizedType<Integer> intTarget = gson.fromJson(json, ptIntegerType);
+    assertThat(intTarget.value).isEqualTo(10);
+
+    MyParameterizedType<String> srcStr = new MyParameterizedType<>("abc");
+    json = MyParameterizedTypeAdapter.getExpectedJson(srcStr);
+    MyParameterizedType<String> stringTarget = gson.fromJson(json, ptStringType);
+    assertThat(stringTarget.value).isEqualTo("abc");
+  }
+
+  @Test
+  public void testParameterizedTypesWithWriterSerialization() {
+    Writer writer = new StringWriter();
+    MyParameterizedType<Integer> src = new MyParameterizedType<>(10);
+    Type typeOfSrc = new TypeToken<MyParameterizedType<Integer>>() {}.getType();
+    gson.toJson(src, typeOfSrc, writer);
+    assertThat(writer.toString()).isEqualTo(src.getExpectedJson());
+  }
+
+  @Test
+  public void testParameterizedTypeWithReaderDeserialization() {
+    BagOfPrimitives bag = new BagOfPrimitives();
+    MyParameterizedType<BagOfPrimitives> expected = new MyParameterizedType<>(bag);
+    Type expectedType = new TypeToken<MyParameterizedType<BagOfPrimitives>>() {}.getType();
+    BagOfPrimitives bagDefaultInstance = new BagOfPrimitives();
+    Gson gson =
+        new GsonBuilder()
+            .registerTypeAdapter(
+                expectedType, new MyParameterizedTypeInstanceCreator<>(bagDefaultInstance))
+            .create();
+
+    Reader json = new StringReader(expected.getExpectedJson());
+    MyParameterizedType<BagOfPrimitives> actual = gson.fromJson(json, expectedType);
+    assertThat(actual).isEqualTo(expected);
   }
 
   @SuppressWarnings("varargs")
