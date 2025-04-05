@@ -363,7 +363,7 @@ public final class GsonBuilder {
    * @since 1.3
    */
   @CanIgnoreReturnValue
-  public GsonBuilder setLongSerializationPolicy(LongSerializationStrategy serializationPolicy) {
+  public GsonBuilder setLongSerializationPolicy(LongSerializationPolicy serializationPolicy) {
     this.longSerializationPolicy = Objects.requireNonNull(serializationPolicy);
     return this;
   }
