@@ -86,25 +86,6 @@ public class ParameterizedTypeFixtures {
     }
   }
 
-  public static class MyParameterizedTypeInstanceCreator<T>
-      implements InstanceCreator<MyParameterizedType<T>> {
-    private final T instanceOfT;
-
-    /**
-     * Caution the specified instance is reused by the instance creator for each call. This means
-     * that the fields of the same objects will be overwritten by Gson. This is usually fine in
-     * tests since there we deserialize just once, but quite dangerous in practice.
-     */
-    public MyParameterizedTypeInstanceCreator(T instanceOfT) {
-      this.instanceOfT = instanceOfT;
-    }
-
-    @Override
-    public MyParameterizedType<T> createInstance(Type type) {
-      return new MyParameterizedType<>(instanceOfT);
-    }
-  }
-
   public static final class MyParameterizedTypeAdapter<T>
       implements JsonSerializer<MyParameterizedType<T>>, JsonDeserializer<MyParameterizedType<T>> {
     @SuppressWarnings("unchecked")
@@ -160,63 +141,3 @@ public class ParameterizedTypeFixtures {
     }
   }
 }
-
-/* supprimer dans test et dans C:\Users\adamr\Desktop\L3 INFO\GL\gson\gson\src\test\java\com\google\gson\PrimitiveTypeAdapter.java
-package com.google.gson;
-
-import com.google.gson.internal.$Gson$Types;
-import com.google.gson.internal.Primitives;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-
-public class ParameterizedTypeFixtures {
-  private ParameterizedTypeFixtures() {}
-
-  public static class MyParameterizedTypeInstanceCreator<T> {
-    private final T instanceOfT;
-
-    public MyParameterizedTypeInstanceCreator(T instanceOfT) {
-      this.instanceOfT = instanceOfT;
-    }
-
-    public T createInstance(Type type) {
-      return instanceOfT;
-    }
-  }
-
-  public static final class MyParameterizedTypeAdapter<T>
-      implements JsonSerializer<T>, JsonDeserializer<T> {
-
-    @Override
-    public JsonElement serialize(T src, Type classOfSrc, JsonSerializationContext context) {
-      JsonObject json = new JsonObject();
-      json.add(src.getClass().getSimpleName(), context.serialize(src));
-      return json;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public T deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-        throws JsonParseException {
-      Type genericClass = ((ParameterizedType) typeOfT).getActualTypeArguments()[0];
-      Class<?> rawType = $Gson$Types.getRawType(genericClass);
-      String className = rawType.getSimpleName();
-      JsonElement jsonElement = json.getAsJsonObject().get(className);
-
-      T value;
-      if (genericClass == Integer.class) {
-        value = (T) Integer.valueOf(jsonElement.getAsInt());
-      } else if (genericClass == String.class) {
-        value = (T) jsonElement.getAsString();
-      } else {
-        value = context.deserialize(jsonElement, rawType);
-      }
-
-      if (Primitives.isPrimitive(genericClass)) {
-        PrimitiveTypeAdapter typeAdapter = new PrimitiveTypeAdapter();
-        value = typeAdapter.adaptType(value, rawType);
-      }
-      return value;
-    }
-  }
-}*/
