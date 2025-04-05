@@ -204,7 +204,7 @@ public final class Gson {
   final String datePattern;
   final int dateStyle;
   final int timeStyle;
-  final LongSerializationStrategy longSerializationPolicy;
+  final LongSerializationPolicy longSerializationPolicy;
   final List<TypeAdapterFactory> builderFactories;
   final List<TypeAdapterFactory> builderHierarchyFactories;
   final ToNumberStrategy objectToNumberStrategy;
