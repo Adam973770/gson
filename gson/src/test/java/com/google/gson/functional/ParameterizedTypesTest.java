@@ -25,7 +25,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.ParameterizedTypeFixtures.MyParameterizedType;
 import com.google.gson.ParameterizedTypeFixtures.MyParameterizedTypeAdapter;
-import com.google.gson.ParameterizedTypeFixtures.MyParameterizedTypeInstanceCreator;
 import com.google.gson.common.TestTypes.BagOfPrimitives;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
@@ -68,12 +67,6 @@ public class ParameterizedTypesTest {
     BagOfPrimitives bag = new BagOfPrimitives();
     MyParameterizedType<BagOfPrimitives> expected = new MyParameterizedType<>(bag);
     Type expectedType = new TypeToken<MyParameterizedType<BagOfPrimitives>>() {}.getType();
-    BagOfPrimitives bagDefaultInstance = new BagOfPrimitives();
-    Gson gson =
-        new GsonBuilder()
-            .registerTypeAdapter(
-                expectedType, new MyParameterizedTypeInstanceCreator<>(bagDefaultInstance))
-            .create();
 
     String json = expected.getExpectedJson();
     MyParameterizedType<BagOfPrimitives> actual = gson.fromJson(json, expectedType);
@@ -135,15 +128,11 @@ public class ParameterizedTypesTest {
         new GsonBuilder()
             .registerTypeAdapter(ptIntegerType, new MyParameterizedTypeAdapter<Integer>())
             .registerTypeAdapter(ptStringType, new MyParameterizedTypeAdapter<String>())
-            .registerTypeAdapter(ptStringType, new MyParameterizedTypeInstanceCreator<>(""))
-            .registerTypeAdapter(ptIntegerType, new MyParameterizedTypeInstanceCreator<>(0))
             .create();
-
     MyParameterizedType<Integer> src = new MyParameterizedType<>(10);
     String json = MyParameterizedTypeAdapter.getExpectedJson(src);
     MyParameterizedType<Integer> intTarget = gson.fromJson(json, ptIntegerType);
     assertThat(intTarget.value).isEqualTo(10);
-
     MyParameterizedType<String> srcStr = new MyParameterizedType<>("abc");
     json = MyParameterizedTypeAdapter.getExpectedJson(srcStr);
     MyParameterizedType<String> stringTarget = gson.fromJson(json, ptStringType);
@@ -164,12 +153,6 @@ public class ParameterizedTypesTest {
     BagOfPrimitives bag = new BagOfPrimitives();
     MyParameterizedType<BagOfPrimitives> expected = new MyParameterizedType<>(bag);
     Type expectedType = new TypeToken<MyParameterizedType<BagOfPrimitives>>() {}.getType();
-    BagOfPrimitives bagDefaultInstance = new BagOfPrimitives();
-    Gson gson =
-        new GsonBuilder()
-            .registerTypeAdapter(
-                expectedType, new MyParameterizedTypeInstanceCreator<>(bagDefaultInstance))
-            .create();
 
     Reader json = new StringReader(expected.getExpectedJson());
     MyParameterizedType<BagOfPrimitives> actual = gson.fromJson(json, expectedType);
