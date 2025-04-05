@@ -912,37 +912,37 @@ public final class GsonBuilder {
 
   private static void addTypeAdaptersForDate(
       String datePattern, int dateStyle, int timeStyle, List<TypeAdapterFactory> factories) {
-    TypeAdapterFactory dateAdapterFactory;
     boolean sqlTypesSupported = SqlTypesSupport.SUPPORTS_SQL_TYPES;
-    TypeAdapterFactory sqlTimestampAdapterFactory = null;
-    TypeAdapterFactory sqlDateAdapterFactory = null;
-
-    if (datePattern != null && !datePattern.trim().isEmpty()) {
-      dateAdapterFactory = DefaultDateTypeAdapter.DateType.DATE.createAdapterFactory(datePattern);
-
-      if (sqlTypesSupported) {
-        sqlTimestampAdapterFactory =
-            SqlTypesSupport.TIMESTAMP_DATE_TYPE.createAdapterFactory(datePattern);
-        sqlDateAdapterFactory = SqlTypesSupport.DATE_DATE_TYPE.createAdapterFactory(datePattern);
-      }
-    } else if (dateStyle != DateFormat.DEFAULT || timeStyle != DateFormat.DEFAULT) {
-      dateAdapterFactory =
-          DefaultDateTypeAdapter.DateType.DATE.createAdapterFactory(dateStyle, timeStyle);
-
-      if (sqlTypesSupported) {
-        sqlTimestampAdapterFactory =
-            SqlTypesSupport.TIMESTAMP_DATE_TYPE.createAdapterFactory(dateStyle, timeStyle);
-        sqlDateAdapterFactory =
-            SqlTypesSupport.DATE_DATE_TYPE.createAdapterFactory(dateStyle, timeStyle);
-      }
-    } else {
-      return;
+    if (shouldUsePattern(datePattern)) {
+      addAdaptersUsingPattern(datePattern, factories, sqlTypesSupported);
+    } else if (shouldUseCustomStyle(dateStyle, timeStyle)) {
+      addAdaptersUsingStyle(dateStyle, timeStyle, factories, sqlTypesSupported);
     }
+  }
 
-    factories.add(dateAdapterFactory);
-    if (sqlTypesSupported) {
-      factories.add(sqlTimestampAdapterFactory);
-      factories.add(sqlDateAdapterFactory);
+  private static boolean shouldUsePattern(String datePattern) {
+    return datePattern != null && !datePattern.trim().isEmpty();
+  }
+
+  private static boolean shouldUseCustomStyle(int dateStyle, int timeStyle) {
+    return dateStyle != DateFormat.DEFAULT || timeStyle != DateFormat.DEFAULT;
+  }
+
+  private static void addAdaptersUsingPattern(
+      String pattern, List<TypeAdapterFactory> factories, boolean sqlSupported) {
+    factories.add(DefaultDateTypeAdapter.DateType.DATE.createAdapterFactory(pattern));
+    if (sqlSupported) {
+      factories.add(SqlTypesSupport.TIMESTAMP_DATE_TYPE.createAdapterFactory(pattern));
+      factories.add(SqlTypesSupport.DATE_DATE_TYPE.createAdapterFactory(pattern));
+    }
+  }
+
+  private static void addAdaptersUsingStyle(
+      int dateStyle, int timeStyle, List<TypeAdapterFactory> factories, boolean sqlSupported) {
+    factories.add(DefaultDateTypeAdapter.DateType.DATE.createAdapterFactory(dateStyle, timeStyle));
+    if (sqlSupported) {
+      factories.add(SqlTypesSupport.TIMESTAMP_DATE_TYPE.createAdapterFactory(dateStyle, timeStyle));
+      factories.add(SqlTypesSupport.DATE_DATE_TYPE.createAdapterFactory(dateStyle, timeStyle));
     }
   }
 }
