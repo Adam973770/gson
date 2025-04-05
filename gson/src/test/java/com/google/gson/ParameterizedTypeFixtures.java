@@ -86,6 +86,25 @@ public class ParameterizedTypeFixtures {
     }
   }
 
+  public static class MyParameterizedTypeInstanceCreator<T>
+      implements InstanceCreator<MyParameterizedType<T>> {
+    private final T instanceOfT;
+
+    /**
+     * Caution the specified instance is reused by the instance creator for each call. This means
+     * that the fields of the same objects will be overwritten by Gson. This is usually fine in
+     * tests since there we deserialize just once, but quite dangerous in practice.
+     */
+    public MyParameterizedTypeInstanceCreator(T instanceOfT) {
+      this.instanceOfT = instanceOfT;
+    }
+
+    @Override
+    public MyParameterizedType<T> createInstance(Type type) {
+      return new MyParameterizedType<>(instanceOfT);
+    }
+  }
+
   public static final class MyParameterizedTypeAdapter<T>
       implements JsonSerializer<MyParameterizedType<T>>, JsonDeserializer<MyParameterizedType<T>> {
     @SuppressWarnings("unchecked")
