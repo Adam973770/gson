@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.google.gson;
 
 import com.google.gson.internal.$Gson$Types;
 import com.google.gson.internal.Primitives;
-import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Objects;
 
 /**
  * This class contains some test fixtures for Parameterized types. These classes should ideally
@@ -34,60 +31,7 @@ import java.util.Objects;
 public class ParameterizedTypeFixtures {
   private ParameterizedTypeFixtures() {}
 
-  public static final class MyParameterizedType<T> {
-    public final T value;
-
-    public MyParameterizedType(T value) {
-      this.value = value;
-    }
-
-    public T getValue() {
-      return value;
-    }
-
-    public String getExpectedJson() {
-      String valueAsJson = getExpectedJson(value);
-      return String.format("{\"value\":%s}", valueAsJson);
-    }
-
-    private static String getExpectedJson(Object obj) {
-      Class<?> clazz = obj.getClass();
-      if (Primitives.isWrapperType(Primitives.wrap(clazz))) {
-        return obj.toString();
-      } else if (obj.getClass().equals(String.class)) {
-        return "\"" + obj.toString() + "\"";
-      } else {
-        // Try invoking a getExpectedJson() method if it exists
-        try {
-          Method method = clazz.getMethod("getExpectedJson");
-          Object results = method.invoke(obj);
-          return (String) results;
-        } catch (ReflectiveOperationException e) {
-          throw new RuntimeException(e);
-        }
-      }
-    }
-
-    @Override
-    public int hashCode() {
-      return value == null ? 0 : value.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (this == obj) {
-        return true;
-      }
-      if (!(obj instanceof MyParameterizedType<?>)) {
-        return false;
-      }
-      MyParameterizedType<?> that = (MyParameterizedType<?>) obj;
-      return Objects.equals(getValue(), that.getValue());
-    }
-  }
-
-  public static class MyParameterizedTypeInstanceCreator<T>
-      implements InstanceCreator<MyParameterizedType<T>> {
+  public static class MyParameterizedTypeInstanceCreator<T> {
     private final T instanceOfT;
 
     /**
@@ -98,45 +42,25 @@ public class ParameterizedTypeFixtures {
     public MyParameterizedTypeInstanceCreator(T instanceOfT) {
       this.instanceOfT = instanceOfT;
     }
-
-    @Override
-    public MyParameterizedType<T> createInstance(Type type) {
-      return new MyParameterizedType<>(instanceOfT);
+  
+    public T createInstance(Type type) {
+      return instanceOfT;
     }
   }
 
   public static final class MyParameterizedTypeAdapter<T>
-      implements JsonSerializer<MyParameterizedType<T>>, JsonDeserializer<MyParameterizedType<T>> {
-    @SuppressWarnings("unchecked")
-    public static <T> String getExpectedJson(MyParameterizedType<T> obj) {
-      Class<T> clazz = (Class<T>) obj.value.getClass();
-      boolean addQuotes = !clazz.isArray() && !Primitives.unwrap(clazz).isPrimitive();
-      StringBuilder sb = new StringBuilder("{\"");
-      sb.append(obj.value.getClass().getSimpleName()).append("\":");
-      if (addQuotes) {
-        sb.append("\"");
-      }
-      sb.append(obj.value.toString());
-      if (addQuotes) {
-        sb.append("\"");
-      }
-      sb.append("}");
-      return sb.toString();
-    }
+      implements JsonSerializer<T>, JsonDeserializer<T> {
 
     @Override
-    public JsonElement serialize(
-        MyParameterizedType<T> src, Type classOfSrc, JsonSerializationContext context) {
+    public JsonElement serialize(T src, Type classOfSrc, JsonSerializationContext context) {
       JsonObject json = new JsonObject();
-      T value = src.getValue();
-      json.add(value.getClass().getSimpleName(), context.serialize(value));
+      json.add(src.getClass().getSimpleName(), context.serialize(src));
       return json;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public MyParameterizedType<T> deserialize(
-        JsonElement json, Type typeOfT, JsonDeserializationContext context)
+    public T deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
         throws JsonParseException {
       Type genericClass = ((ParameterizedType) typeOfT).getActualTypeArguments()[0];
       Class<?> rawType = $Gson$Types.getRawType(genericClass);
@@ -149,14 +73,14 @@ public class ParameterizedTypeFixtures {
       } else if (genericClass == String.class) {
         value = (T) jsonElement.getAsString();
       } else {
-        value = (T) jsonElement;
+        value = context.deserialize(jsonElement, rawType);
       }
 
       if (Primitives.isPrimitive(genericClass)) {
         PrimitiveTypeAdapter typeAdapter = new PrimitiveTypeAdapter();
-        value = (T) typeAdapter.adaptType(value, rawType);
+        value = typeAdapter.adaptType(value, rawType);
       }
-      return new MyParameterizedType<>(value);
+      return value;
     }
   }
 }
